@@ -17,51 +17,53 @@
     <button><img src="https://browserid.org/i/sign_in_green.png" alt="sign in with browser ID"></button>
   </section>
 <script>
-var request,
-    but = document.querySelector('button'),
-    h1 = document.querySelector('h1');
-but.addEventListener('click', function(ev) {
-
-  navigator.id.getVerifiedEmail(function(assertion) {
-    if (assertion) {
-      verify(assertion);
-    } else {
-      alert('I still don\'t know you...');
-    }
-  });
-
-  function verify(assertion) {
-    request = new XMLHttpRequest();
-    var parameters = 'assert=' + assertion;
-    request.open('POST', 'verify.php');
-    request.setRequestHeader('If-Modified-Since',
-                             'Wed, 05 Apr 2006 00:00:00 GMT');
-    request.setRequestHeader('Content-type',
-                             'application/x-www-form-urlencoded');
-    request.setRequestHeader('Content-length', parameters.length);
-    request.setRequestHeader('Connection', 'close');
-    request.send(encodeURI(parameters));
+(function(){
+  var request,
+      but = document.querySelector('button'),
+      h1 = document.querySelector('h1');
     
-    request.onreadystatechange = function() {
-      if (request.readyState == 4){
-        if (request.status && (/200|304/).test(request.status)) {
-          response = JSON.parse(request.responseText);
-          if(response.status === 'okay') {
-            message = 'Well, hi there, '+response.email;
-            var p = document.createElement('p');
-            p.innerHTML = message;
-            but.parentNode.replaceChild(p,but);
-            h1.innerHTML = 'Woohoo, I know you!';
-          }
-        } else{
-          alert('couldn\'t log you in. Sad panda now!');
-        }
+  but.addEventListener('click', function(ev) {
+
+    navigator.id.getVerifiedEmail(function(assertion) {
+      if (assertion) {
+        verify(assertion);
+      } else {
+        alert('I still don\'t know you...');
       }
-    };
-  }
+    });
 
-}, false);
+    function verify(assertion) {
+      request = new XMLHttpRequest();
+      var parameters = 'assert=' + assertion;
+      request.open('POST', 'verify.php');
+      request.setRequestHeader('If-Modified-Since',
+                               'Wed, 05 Apr 2006 00:00:00 GMT');
+      request.setRequestHeader('Content-type',
+                               'application/x-www-form-urlencoded');
+      request.setRequestHeader('Content-length', parameters.length);
+      request.setRequestHeader('Connection', 'close');
+      request.send(encodeURI(parameters));
+    
+      request.onreadystatechange = function() {
+        if (request.readyState == 4){
+          if (request.status && (/200|304/).test(request.status)) {
+            response = JSON.parse(request.responseText);
+            if(response.status === 'okay') {
+              message = 'Well, hi there, '+response.email;
+              var p = document.createElement('p');
+              p.innerHTML = message;
+              but.parentNode.replaceChild(p,but);
+              h1.innerHTML = 'Woohoo, I know you!';
+            }
+          } else{
+            alert('couldn\'t log you in. Sad panda now!');
+          }
+        }
+      };
+    }
 
+  }, false);
+}());
 </script>
 </body>
 </html>
